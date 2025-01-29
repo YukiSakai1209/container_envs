@@ -1,0 +1,29 @@
+{
+    "name": "Data Science Container",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter",
+                "ms-python.black-formatter",
+                "ms-python.isort",
+                "GitHub.copilot",
+                "eamodio.gitlens",
+                "ms-toolsai.jupyter-keymap",
+                "ms-toolsai.jupyter-renderers",
+                "ms-vscode-remote.remote-containers"
+            ]
+        }
+    },
+    "remoteUser": "vscode",
+    "updateRemoteUserUID": true,
+    "postCreateCommand": "pip install --user -r requirements.txt",
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    }
+}

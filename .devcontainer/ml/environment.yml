@@ -1,0 +1,31 @@
+name: ml_env
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+  - defaults
+dependencies:
+  - python=3.12
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda
+  - tensorflow
+  - scikit-learn
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - jupyter
+  - ipykernel
+  - black
+  - isort
+  - flake8
+  - pytest
+  - pip
+  - pip:
+    - transformers
+    - datasets
+    - tensorboard
+    - optuna
+    - wandb
