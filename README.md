@@ -1,14 +1,16 @@
-# Neuroscience Development Environment
+# Development Environments
 
-This repository contains a development environment setup for neuroscience research using Dev Containers.
+This repository contains development environment configurations using Dev Containers for various development purposes.
 
 ## Features
 
-- Pre-configured development environment for neuroscience research
-- Data science tools and libraries
-- GPU support for computational tasks
-- Jupyter Lab integration
-- Code quality tools
+- Multiple pre-configured development environments:
+  - Data Science environment for research and analysis
+  - Web Development environment for full-stack development
+  - Base environment with common development tools
+- VS Code/Windsurf integration
+- Code quality and development tools
+- Remote development support
 
 ## Prerequisites
 
@@ -27,47 +29,43 @@ cd container_envs
 2. Open in VS Code/Windsurf:
 - Open the cloned directory
 - When prompted, click "Reopen in Container"
+- Select the appropriate environment (data-science or web-dev)
 - The container will be built automatically
 
-Alternatively, you can pull the pre-built Docker image:
-```bash
-docker pull yukisakai1209/neuro-science-dev:latest
-```
+## Available Environments
 
-## Environment Details
-
-The development environment includes:
-
-- Python 3.10+
+### Data Science Environment
+Located in `.devcontainer/data-science/`:
+- Python 3.12
+- Conda environment management
 - Essential data science packages (numpy, pandas, scipy)
-- Machine learning frameworks (scikit-learn, pytorch)
 - Visualization tools (matplotlib, seaborn, plotly)
-- Performance optimization tools (numba, cython)
 - Code quality tools (flake8, black)
+- Jupyter integration
 
-## Updating the Environment
+### Web Development Environment
+Located in `.devcontainer/web-dev/`:
+- Node.js development environment
+- Web development tools and extensions
+- Code quality and formatting tools
 
-The environment is automatically updated when changes are pushed to the main branch. To get the latest version:
-
-1. Pull the latest changes from GitHub:
-```bash
-git pull origin main
-```
-
-2. Rebuild the Dev Container:
-- VS Code: Click the "Rebuild Container" button in the command palette
-- Windsurf: Use the Dev Container rebuild option
-- Docker: Pull the latest image:
-```bash
-docker pull yukisakai1209/neuro-science-dev:latest
-```
+### Base Environment
+Located in `.devcontainer/base/`:
+- Common development tools
+- Basic VS Code extensions
+- Git integration
 
 ## Directory Structure
 
 - `.devcontainer/`: Contains all Dev Container configurations
   - `data-science/`: Data science environment configuration
+  - `web-dev/`: Web development environment configuration
   - `base/`: Base development environment
-  - `ml/`: Machine learning specific configuration
+  - `remote-setup.md`: Guide for remote development setup
+
+## Remote Development
+
+For remote development setup and requirements, please refer to `.devcontainer/remote-setup.md`.
 
 ## Contributing
 
