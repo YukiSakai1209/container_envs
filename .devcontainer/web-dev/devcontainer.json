@@ -21,8 +21,8 @@
     "features": {
         "ghcr.io/devcontainers/features/git:1": {},
         "ghcr.io/devcontainers/features/node:1": {
-            "version": "lts"
+            "version": "20"
         }
     },
-    "postCreateCommand": "npm install"
+    "postCreateCommand": "if [ -f package.json ]; then npm install; fi"
 }
