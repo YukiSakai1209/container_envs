@@ -1,33 +1,34 @@
 name: y_241209
 channels:
-  - conda-forge
-  - anaconda
   - defaults
 dependencies:
   - python=3.12.2
-  - anaconda
-  - numpy
-  - pandas
-  - scipy
-  - matplotlib
-  - seaborn
-  - scikit-learn
-  - jupyter
-  - ipykernel
-  - black
-  - isort
-  - flake8
-  - pytest
   - pip
   - pip:
-    - acres==0.1.0
-    - bids-validator==1.14.7.post0
-    - bidsschematools==0.11.3.post3
-    - plotbin==3.1.7
-    - puremagic==1.28
-    - python-louvain==0.16
-    - rdflib==6.3.2
-    - simplejson==3.19.3
-    - slir==0.5.1
-    - teneto==0.5.3
-    - universal-pathlib==0.2.5
+    # 基本的な科学計算パッケージ
+    - numpy==1.26.4
+    - pandas==2.2.3
+    - scipy==1.13.1
+    - matplotlib==3.9.2
+    - seaborn==0.13.2
+    # 神経科学関連パッケージ
+    - nibabel==5.3.2
+    - nipy==0.6.0
+    - nilearn==0.10.4
+    - nipype==1.9.1
+    # 機械学習・最適化関連
+    - scikit-learn==1.5.1
+    - networkx==3.3.0
+    - joblib==1.4.2
+    - hdbscan==0.8.39
+    - pacmap==0.7.6
+    - optuna==4.1.0
+    - hyperopt==0.2.7
+    - bctpy==0.6.1
+    # 統計解析
+    - statannotations==0.7.1
+    - pingouin==0.5.5
+    # ユーティリティ
+    - tqdm==4.67.1
+    - jupyter==1.0.0
+    - ipykernel==6.28.0

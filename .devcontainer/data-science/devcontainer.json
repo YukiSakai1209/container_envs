@@ -1,7 +1,8 @@
 {
     "name": "Data Science Container",
     "build": {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "Dockerfile",
+        "context": "."
     },
     "customizations": {
         "vscode": {
@@ -16,14 +17,20 @@
                 "ms-toolsai.jupyter-keymap",
                 "ms-toolsai.jupyter-renderers",
                 "ms-vscode-remote.remote-containers"
-            ]
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/opt/conda/envs/y_241209/bin/python",
+                "python.formatting.provider": "black",
+                "python.linting.enabled": true,
+                "python.linting.flake8Enabled": true
+            }
         }
     },
     "remoteUser": "vscode",
     "updateRemoteUserUID": true,
-    "postCreateCommand": "pip install --user -r requirements.txt",
     "features": {
-        "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
-    }
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    "waitFor": "updateContentCommand",
+    "postCreateCommand": "conda init bash && echo 'conda activate y_241209' >> ~/.bashrc"
 }
