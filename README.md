@@ -85,6 +85,54 @@ To choose which environment to use when opening in Dev Container:
 
 Note: Always commit your preferred environment configuration to ensure consistency across team members.
 
+## Environment Setup
+
+### Initial Setup
+
+1. **Build the Base Environment**
+   ```bash
+   cd base
+   docker build -t research-env .
+   ```
+
+2. **Configure VS Code**
+   - Install the "Dev Containers" extension
+   - Open the command palette (Ctrl+Shift+P or Cmd+Shift+P)
+   - Select "Dev Containers: Open Folder in Container"
+   - Choose your project directory
+
+### Important Notes on Conda Environment
+
+The container is configured to automatically initialize and activate the conda environment. The setup includes:
+
+- Proper conda initialization for both root and vscode users
+- Automatic activation of the `research` environment
+- Environment variables set for consistent conda behavior
+- Login shell configuration for proper environment loading
+
+If you encounter any conda-related issues:
+
+1. Ensure you're using a login shell:
+   ```bash
+   # Check if you're in a login shell
+   echo $0
+   # If not in a login shell, start one
+   bash -l
+   ```
+
+2. Verify conda environment:
+   ```bash
+   # Check conda configuration
+   conda info
+   # Ensure research environment is active
+   echo $CONDA_DEFAULT_ENV
+   ```
+
+3. If needed, manually source the conda configuration:
+   ```bash
+   source /etc/profile.d/conda-env.sh
+   ```
+
 ## Using in a New Project
 
 1. Create a new repository from this template:
