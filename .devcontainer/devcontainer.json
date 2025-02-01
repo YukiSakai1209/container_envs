@@ -29,6 +29,14 @@
             "settings": {
                 "python.defaultInterpreterPath": "/opt/conda/envs/research/bin/python",
                 "python.terminal.activateEnvironment": true,
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash",
+                        "args": ["--login"]
+                    }
+                },
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.inheritEnv": false,
                 "python.linting.enabled": true,
                 "python.formatting.provider": "black",
                 "editor.formatOnSave": true,
@@ -43,7 +51,7 @@
     "remoteUser": "vscode",
     "updateRemoteUserUID": true,
     "overrideCommand": false,
-    "postCreateCommand": "echo 'conda activate research' >> ~/.bashrc",
+    "postCreateCommand": "echo 'source /opt/conda/etc/profile.d/conda.sh && conda activate research' >> ~/.bashrc",
     "mounts": [
         "source=${localEnv:HOME}/.windsurf,target=/home/vscode/.windsurf,type=bind,consistency=cached"
     ]
