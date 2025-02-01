@@ -37,10 +37,23 @@ WORKDIR /home/vscode
 # Setup conda for vscode user
 RUN mkdir -p ~/.conda && \
     conda init bash && \
-    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' >> ~/.bashrc && \
-    echo '    . "/opt/conda/etc/profile.d/conda.sh"' >> ~/.bashrc && \
-    echo '    conda activate research' >> ~/.bashrc && \
-    echo 'fi'  >> ~/.bashrc
+    echo '# >>> conda initialize >>>' > ~/.bashrc && \
+    echo '# !! Contents within this block are managed by conda init !!' >> ~/.bashrc && \
+    echo '__conda_setup="$('\''/opt/conda/bin/conda'\'' '\''shell.bash'\'' '\''hook'\'' 2> /dev/null)"' >> ~/.bashrc && \
+    echo 'if [ $? -eq 0 ]; then' >> ~/.bashrc && \
+    echo '    eval "$__conda_setup"' >> ~/.bashrc && \
+    echo 'else' >> ~/.bashrc && \
+    echo '    if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' >> ~/.bashrc && \
+    echo '        . "/opt/conda/etc/profile.d/conda.sh"' >> ~/.bashrc && \
+    echo '    else' >> ~/.bashrc && \
+    echo '        export PATH="/opt/conda/bin:$PATH"' >> ~/.bashrc && \
+    echo '    fi' >> ~/.bashrc && \
+    echo 'fi' >> ~/.bashrc && \
+    echo 'unset __conda_setup' >> ~/.bashrc && \
+    echo '# <<< conda initialize <<<' >> ~/.bashrc && \
+    echo '' >> ~/.bashrc && \
+    echo '# Activate research environment' >> ~/.bashrc && \
+    echo 'conda activate research' >> ~/.bashrc
 
 # Set environment variables
 ENV PATH=/opt/conda/bin:$PATH \
