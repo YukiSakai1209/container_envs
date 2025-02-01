@@ -30,11 +30,11 @@ RUN echo "user_allow_other" >> /etc/fuse.conf
 COPY environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml \
     && conda init bash \
-    && echo "conda activate y_241209" >> /home/vscode/.bashrc \
+    && echo "conda activate research" >> /home/vscode/.bashrc \
     && conda clean -a -y \
     && rm -rf /tmp/environment.yml
 
 # Make sure the vscode user owns its home directory and the conda environment
-RUN chown -R vscode:vscode /home/vscode /opt/conda/envs/y_241209
+RUN chown -R vscode:vscode /home/vscode /opt/conda/envs/research
 
 USER $USERNAME
