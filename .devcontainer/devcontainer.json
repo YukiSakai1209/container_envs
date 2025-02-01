@@ -4,26 +4,26 @@
         "context": "../base",
         "dockerfile": "Dockerfile"
     },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/vermeer/container_envs,type=bind,consistency=cached",
+    "workspaceFolder": "/home/vscode/vermeer/container_envs",
     "customizations": {
         "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/opt/conda/envs/research/bin/python",
+                "python.terminal.activateEnvironment": true
+            },
             "extensions": [
                 "ms-python.python",
                 "ms-python.vscode-pylance"
-            ],
-            "settings": {
-                "python.defaultInterpreterPath": "/opt/conda/envs/research/bin/python"
-            }
+            ]
         }
     },
     "features": {
         "ghcr.io/devcontainers/features/python:1": "none"
     },
-    "postCreateCommand": "echo 'source ~/.bashrc' >> ~/.profile",
     "remoteUser": "vscode",
     "updateRemoteUserUID": true,
-    "workspaceFolder": "/home/vscode/vermeer/container_envs",
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/vermeer/container_envs,type=bind,consistency=cached",
-    "mounts": [
-        "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
-    ]
+    "postCreateCommand": "source /etc/profile.d/conda.sh && conda activate research",
+    "postStartCommand": "source /etc/profile.d/conda.sh && conda activate research",
+    "postAttachCommand": "source /etc/profile.d/conda.sh && conda activate research"
 }
