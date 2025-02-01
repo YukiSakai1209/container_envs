@@ -24,8 +24,16 @@ RUN conda update -n base -c defaults conda && \
     conda env create -f /tmp/environment.yml && \
     conda clean -afy
 
+# Set environment variables
+ENV PATH=/opt/conda/bin:$PATH \
+    CONDA_DIR=/opt/conda \
+    SHELL=/bin/bash \
+    CONDA_AUTO_ACTIVATE_BASE=false
+
 # Initialize conda in system-wide profile
 RUN conda init bash && \
+    echo '. /opt/conda/etc/profile.d/conda.sh' > /etc/profile.d/conda.sh && \
+    chmod +x /etc/profile.d/conda.sh && \
     echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' >> /etc/bash.bashrc && \
     echo '    . "/opt/conda/etc/profile.d/conda.sh"' >> /etc/bash.bashrc && \
     echo '    if [[ -z "${CONDA_DEFAULT_ENV}" || "${CONDA_DEFAULT_ENV}" == "base" ]]; then' >> /etc/bash.bashrc && \
@@ -40,31 +48,10 @@ WORKDIR /home/vscode
 # Setup conda for vscode user with research environment activation
 RUN mkdir -p ~/.conda && \
     conda init bash && \
-    echo '# >>> conda initialize >>>' > ~/.bashrc && \
-    echo '# !! Contents within this block are managed by conda init !!' >> ~/.bashrc && \
-    echo '__conda_setup="$('\''/opt/conda/bin/conda'\'' '\''shell.bash'\'' '\''hook'\'' 2> /dev/null)"' >> ~/.bashrc && \
-    echo 'if [ $? -eq 0 ]; then' >> ~/.bashrc && \
-    echo '    eval "$__conda_setup"' >> ~/.bashrc && \
-    echo 'else' >> ~/.bashrc && \
-    echo '    if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' >> ~/.bashrc && \
-    echo '        . "/opt/conda/etc/profile.d/conda.sh"' >> ~/.bashrc && \
-    echo '    else' >> ~/.bashrc && \
-    echo '        export PATH="/opt/conda/bin:$PATH"' >> ~/.bashrc && \
+    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' > ~/.bashrc && \
+    echo '    . "/opt/conda/etc/profile.d/conda.sh"' >> ~/.bashrc && \
+    echo '    conda config --set auto_activate_base false' >> ~/.bashrc && \
+    echo '    if [[ -z "${CONDA_DEFAULT_ENV}" || "${CONDA_DEFAULT_ENV}" == "base" ]]; then' >> ~/.bashrc && \
+    echo '        conda activate research' >> ~/.bashrc && \
     echo '    fi' >> ~/.bashrc && \
-    echo 'fi' >> ~/.bashrc && \
-    echo 'unset __conda_setup' >> ~/.bashrc && \
-    echo '# <<< conda initialize <<<' >> ~/.bashrc && \
-    echo '' >> ~/.bashrc && \
-    echo '# Ensure research environment is activated' >> ~/.bashrc && \
-    echo 'if [[ -z "${CONDA_DEFAULT_ENV}" || "${CONDA_DEFAULT_ENV}" == "base" ]]; then' >> ~/.bashrc && \
-    echo '    conda activate research' >> ~/.bashrc && \
-    echo 'fi' >> ~/.bashrc && \
-    echo '' >> ~/.bashrc && \
-    echo '# Disable auto-activation of base environment' >> ~/.bashrc && \
-    echo 'conda config --set auto_activate_base false' >> ~/.bashrc
-
-# Set environment variables
-ENV PATH=/opt/conda/bin:$PATH \
-    CONDA_DIR=/opt/conda \
-    SHELL=/bin/bash \
-    CONDA_AUTO_ACTIVATE_BASE=false
+    echo 'fi' >> ~/.bashrc
