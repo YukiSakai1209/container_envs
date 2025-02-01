@@ -1,6 +1,11 @@
 {
     "name": "Research Environment",
     "dockerComposeFile": "docker-compose.yml",
+    "build": {
+        "args": {
+            "ENVIRONMENT_YML": ".devcontainer/environment.yml"
+        }
+    },
     "service": "workspace",
     "workspaceFolder": "/home/vscode/vermeer/container_envs",
     "customizations": {

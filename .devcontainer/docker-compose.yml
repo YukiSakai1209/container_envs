@@ -10,6 +10,7 @@ services:
         USER_UID: "1001"
         USER_GID: "1001"
         USERNAME: vscode
+        ENVIRONMENT_YML: ${ENVIRONMENT_YML:-".devcontainer/environment.yml"}
     volumes:
       - type: bind
         source: ${HOME}/.ssh

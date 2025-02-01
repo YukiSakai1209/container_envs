@@ -26,8 +26,11 @@ RUN usermod -u 1001 vscode \
 # Add FUSE device access
 RUN echo "user_allow_other" >> /etc/fuse.conf
 
+# Add build argument for environment file
+ARG ENVIRONMENT_YML=environment.yml
+
 # Copy environment.yml and create conda environment
-COPY environment.yml /tmp/environment.yml
+COPY ${ENVIRONMENT_YML} /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml \
     && conda init bash \
     && echo "conda activate research" >> /home/vscode/.bashrc \

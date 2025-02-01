@@ -10,6 +10,81 @@ This repository contains a development environment configuration using Dev Conta
 - Remote development support with SSHFS integration
 - PBS job submission support for compute clusters
 
+## Environment Selection
+
+This repository provides two types of environment configurations:
+
+1. **Base Environment** (`base/environment.yml`):
+   - Lightweight development environment with minimal dependencies
+   - Uses latest versions of packages for development flexibility
+   - Includes development tools (black, ruff, pytest)
+   - Suitable for:
+     - Initial development and testing
+     - Code formatting and linting
+     - Quick prototyping
+
+2. **Full Research Environment** (`.devcontainer/environment.yml`):
+   - Complete research environment with version-locked dependencies
+   - Includes extensive scientific and neuroscience packages
+   - Ensures reproducibility across different systems
+   - Suitable for:
+     - Running actual analyses
+     - Producing final results
+     - Collaboration with version-controlled environment
+
+### How to Choose
+
+- For a new project, start with the **Base Environment** if you need flexibility during initial development
+- Use the **Full Research Environment** when:
+  - You need specific package versions for reproducibility
+  - Your analysis requires specialized neuroscience packages
+  - You're collaborating with others and need environment consistency
+  - You're ready to run final analyses
+
+Note: You should choose one environment type based on your project's needs. Mixing both environments is not recommended as it may lead to dependency conflicts.
+
+### Switching Between Environments
+
+To choose which environment to use when opening in Dev Container:
+
+1. **Base Environment Setup**:
+   ```jsonc
+   // .devcontainer/devcontainer.json
+   {
+     "name": "Research Environment - Base",
+     "build": {
+       "dockerfile": "Dockerfile",
+       "context": "..",
+       "args": {
+         "ENVIRONMENT_YML": "base/environment.yml"  // Point to base environment
+       }
+     }
+   }
+   ```
+
+2. **Full Research Environment Setup**:
+   ```jsonc
+   // .devcontainer/devcontainer.json
+   {
+     "name": "Research Environment - Full",
+     "build": {
+       "dockerfile": "Dockerfile",
+       "context": "..",
+       "args": {
+         "ENVIRONMENT_YML": ".devcontainer/environment.yml"  // Point to full environment
+       }
+     }
+   }
+   ```
+
+3. **Switching Process**:
+   1. Edit `.devcontainer/devcontainer.json` to point to your desired environment
+   2. Run Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+   3. Select "Dev Containers: Rebuild Container"
+   4. VS Code will rebuild with your selected environment
+
+Note: Always commit your preferred environment configuration to ensure consistency across team members.
+
 ## Using in a New Project
 
 1. Create a new repository from this template:
