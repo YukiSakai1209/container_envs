@@ -67,8 +67,8 @@ cd container_envs
 #### Option 1: Direct Container Usage
 ```bash
 # On compute server
-docker pull [your-container-registry]/research-env:latest
-docker run -v /path/to/data:/data [your-container-registry]/research-env:latest python /data/your_script.py
+docker pull ghcr.io/yukisakai1209/research-env:latest
+docker run -v /path/to/data:/data ghcr.io/yukisakai1209/research-env:latest python /data/your_script.py
 ```
 
 #### Option 2: PBS Job Submission
@@ -80,7 +80,7 @@ docker run -v /path/to/data:/data [your-container-registry]/research-env:latest 
 #PBS -N your_job_name
 
 cd $PBS_O_WORKDIR
-docker run -v /path/to/data:/data [your-container-registry]/research-env:latest python /data/your_script.py
+docker run -v /path/to/data:/data ghcr.io/yukisakai1209/research-env:latest python /data/your_script.py
 ```
 
 2. Submit the job:
@@ -88,17 +88,7 @@ docker run -v /path/to/data:/data [your-container-registry]/research-env:latest 
 qsub your_job_script.pbs
 ```
 
-### 3. Shared Container Registry (Optional)
-To optimize storage and ensure consistency across compute servers:
-1. Set up a private container registry
-2. Push your container image:
-```bash
-docker tag research-env:latest [registry-url]/research-env:latest
-docker push [registry-url]/research-env:latest
-```
-3. Configure compute servers to pull from this registry
-
-## Container Registry
+### 3. Container Registry (GHCR)
 
 We use GitHub Container Registry (GHCR) to distribute our development environment. This provides several benefits:
 
