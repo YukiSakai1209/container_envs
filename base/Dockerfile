@@ -21,7 +21,7 @@ RUN groupmod -g 1001 vscode || groupadd -g 1001 vscode && \
 # Ensure conda environment is properly set up
 ENV CONDA_DIR=/opt/conda
 ENV PATH=$CONDA_DIR/bin:$PATH
-ENV CONDA_AUTO_ACTIVATE_BASE=false
+ENV SHELL=/bin/bash
 
 # Copy and setup Conda environment
 COPY environment.yml /tmp/environment.yml
@@ -29,17 +29,31 @@ RUN conda env create -f /tmp/environment.yml && \
     conda clean -afy
 
 # Initialize conda in system-wide profile
-RUN echo '. $CONDA_DIR/etc/profile.d/conda.sh' >> /etc/profile.d/conda.sh && \
-    echo 'conda activate research' >> /etc/profile.d/conda.sh && \
-    chmod +x /etc/profile.d/conda.sh
+RUN conda init bash && \
+    echo '. "$CONDA_DIR/etc/profile.d/conda.sh"' >> /etc/bash.bashrc && \
+    echo 'conda activate research' >> /etc/bash.bashrc
 
 # Setup for vscode user
 USER vscode
-RUN echo '. $CONDA_DIR/etc/profile.d/conda.sh' >> ~/.bashrc && \
-    echo 'conda activate research' >> ~/.bashrc
+WORKDIR /home/vscode
+
+# Initialize conda for vscode user
+RUN conda init bash && \
+    echo '. "$CONDA_DIR/etc/profile.d/conda.sh"' >> ~/.bashrc && \
+    echo 'conda activate research' >> ~/.bashrc && \
+    mkdir -p ~/.conda
+
+# Create conda activation script
+RUN echo '#!/bin/bash\n\
+if [ -f "$CONDA_DIR/etc/profile.d/conda.sh" ]; then\n\
+    . "$CONDA_DIR/etc/profile.d/conda.sh"\n\
+    conda activate research\n\
+fi' > ~/.conda/activate_conda.sh && \
+    chmod +x ~/.conda/activate_conda.sh
 
 USER root
 
 # Set default shell to interactive bash
 SHELL ["/bin/bash", "--login", "-c"]
+ENTRYPOINT ["/home/vscode/.conda/activate_conda.sh"]
 CMD ["bash", "--login"]
