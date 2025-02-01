@@ -21,7 +21,23 @@ This repository contains a development environment configuration using Dev Conta
      README.md
      ```
 
-2. Set up the directory structure:
+2. Update `.devcontainer/devcontainer.json` to use a specific version:
+   ```jsonc
+   {
+     "name": "Research Environment",
+     "build": {
+       "dockerfile": "Dockerfile",
+       "args": {
+         // Use a specific version of the base image
+         "BASE_IMAGE": "ghcr.io/yukisakai1209/research-env-base:v2025.02.01"
+       }
+     }
+   }
+   ```
+   - Replace `v2025.02.01` with your desired version
+   - Or use `latest` for the most recent stable version
+
+3. Set up the directory structure:
    ```
    your-project/
    ├── README.md              # Project overview
@@ -41,14 +57,14 @@ This repository contains a development environment configuration using Dev Conta
    └── archives/           # Archived code
    ```
 
-3. Configure the environment:
+4. Configure the environment:
    - Copy `.devcontainer/` to your project
    - The container will automatically:
      - Use the base image `ghcr.io/yukisakai1209/research-env-base`
      - Create and activate the `research` conda environment
      - Set up SSHFS mounts for remote access
 
-4. Start development:
+5. Start development:
    ```bash
    # Clone your new repository
    git clone https://github.com/your-username/your-project.git
@@ -60,7 +76,7 @@ This repository contains a development environment configuration using Dev Conta
    - Click "Reopen in Container" when prompted
    - The environment will be automatically set up
 
-5. Add project-specific dependencies:
+6. Add project-specific dependencies:
    - Create `base/environment.yml` for additional packages:
      ```yaml
      name: research
