@@ -30,21 +30,23 @@ RUN conda env create -f /tmp/environment.yml && \
 
 # Initialize conda for both root and vscode user
 RUN conda init bash && \
-    echo '. /opt/conda/etc/profile.d/conda.sh' >> /etc/bash.bashrc && \
-    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then . "/opt/conda/etc/profile.d/conda.sh"; fi' >> /etc/profile && \
+    echo '. "$CONDA_DIR/etc/profile.d/conda.sh"' >> /etc/bash.bashrc && \
+    echo 'if [ -f "$CONDA_DIR/etc/profile.d/conda.sh" ]; then . "$CONDA_DIR/etc/profile.d/conda.sh"; fi' >> /etc/profile && \
     echo 'conda activate research' >> /etc/profile
 
 # Setup for vscode user
 USER vscode
 RUN conda init bash && \
-    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then . "/opt/conda/etc/profile.d/conda.sh"; fi' >> ~/.bashrc && \
+    echo 'if [ -f "$CONDA_DIR/etc/profile.d/conda.sh" ]; then . "$CONDA_DIR/etc/profile.d/conda.sh"; fi' >> ~/.bashrc && \
     echo 'conda activate research' >> ~/.bashrc && \
     mkdir -p ~/.conda
 
-# Create a script to ensure conda is initialized
+# Ensure conda environment is properly initialized
 RUN echo '#!/bin/bash\n\
-if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then\n\
-    . "/opt/conda/etc/profile.d/conda.sh"\n\
+export CONDA_DIR=/opt/conda\n\
+export PATH=$CONDA_DIR/bin:$PATH\n\
+if [ -f "$CONDA_DIR/etc/profile.d/conda.sh" ]; then\n\
+    . "$CONDA_DIR/etc/profile.d/conda.sh"\n\
     conda activate research\n\
 fi\n\
 exec "$@"' > ~/.conda/ensure_conda.sh && \
