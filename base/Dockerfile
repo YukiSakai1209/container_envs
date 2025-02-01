@@ -31,27 +31,18 @@ ENV PATH=/opt/conda/bin:$PATH \
     CONDA_AUTO_ACTIVATE_BASE=false
 
 # Initialize conda in system-wide profile
-RUN conda init bash && \
-    echo '. /opt/conda/etc/profile.d/conda.sh' > /etc/profile.d/conda.sh && \
+RUN echo '. /opt/conda/etc/profile.d/conda.sh' > /etc/profile.d/conda.sh && \
     chmod +x /etc/profile.d/conda.sh && \
-    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' >> /etc/bash.bashrc && \
-    echo '    . "/opt/conda/etc/profile.d/conda.sh"' >> /etc/bash.bashrc && \
-    echo '    if [[ -z "${CONDA_DEFAULT_ENV}" || "${CONDA_DEFAULT_ENV}" == "base" ]]; then' >> /etc/bash.bashrc && \
-    echo '        conda activate research' >> /etc/bash.bashrc && \
-    echo '    fi' >> /etc/bash.bashrc && \
-    echo 'fi' >> /etc/bash.bashrc
+    echo '. /etc/profile.d/conda.sh' >> /etc/bash.bashrc && \
+    echo 'conda config --set auto_activate_base false' >> /etc/bash.bashrc && \
+    echo 'conda activate research' >> /etc/bash.bashrc
 
 # Switch to vscode user and setup conda
 USER vscode
 WORKDIR /home/vscode
 
-# Setup conda for vscode user with research environment activation
-RUN mkdir -p ~/.conda && \
-    conda init bash && \
-    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' > ~/.bashrc && \
-    echo '    . "/opt/conda/etc/profile.d/conda.sh"' >> ~/.bashrc && \
-    echo '    conda config --set auto_activate_base false' >> ~/.bashrc && \
-    echo '    if [[ -z "${CONDA_DEFAULT_ENV}" || "${CONDA_DEFAULT_ENV}" == "base" ]]; then' >> ~/.bashrc && \
-    echo '        conda activate research' >> ~/.bashrc && \
-    echo '    fi' >> ~/.bashrc && \
-    echo 'fi' >> ~/.bashrc
+# Setup conda for vscode user
+RUN echo '. /opt/conda/etc/profile.d/conda.sh' >> ~/.bashrc && \
+    echo 'conda config --set auto_activate_base false' >> ~/.bashrc && \
+    echo 'conda activate research' >> ~/.bashrc && \
+    echo 'export CONDA_AUTO_ACTIVATE_BASE=false' >> ~/.bashrc

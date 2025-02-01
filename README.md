@@ -621,3 +621,92 @@ If you need to reset your setup:
    # Restart VS Code
    code .
    ```
+
+## Research Environment Setup
+
+This repository contains the configuration for a research-focused development environment using Docker containers and VSCode Dev Containers.
+
+## Environment Configuration
+
+The environment is built on top of `continuumio/miniconda3` and includes:
+- Python with conda package management
+- Essential system utilities (git, build-essential, etc.)
+- SSHFS support for remote filesystem mounting
+
+### Conda Environment Setup
+
+The environment uses a dedicated conda environment named `research` defined in `environment.yml`. The conda initialization is handled automatically through several mechanisms:
+
+1. System-wide initialization in `/etc/bash.bashrc`
+2. User-specific initialization in `~/.bashrc`
+3. VSCode integrated terminal configuration
+
+#### Important Settings
+
+The following VSCode settings are crucial for proper conda environment activation:
+
+```json
+{
+    "terminal.integrated.inheritEnv": false,
+    "python.terminal.activateEnvironment": true,
+    "terminal.integrated.defaultProfile.linux": "bash"
+}
+```
+
+These settings are automatically configured in the Dev Container.
+
+## Troubleshooting
+
+### Conda Activation Issues
+
+If you encounter the error `CondaError: Run 'conda init' before 'conda activate'`, try the following steps:
+
+1. Ensure you're using the latest version of the container:
+   ```bash
+   cd ~/vermeer/container_envs/base
+   docker build -t research-env .
+   ```
+
+2. Restart VSCode completely and reopen the Dev Container
+
+3. Verify the conda initialization:
+   ```bash
+   echo $CONDA_DIR
+   ls -l $CONDA_DIR/etc/profile.d/conda.sh
+   conda info
+   ```
+
+4. If issues persist, check that:
+   - The integrated terminal is using bash as the default shell
+   - The terminal is started as a login shell
+   - The conda initialization files exist and are properly sourced
+
+### Environment Reset
+
+If you need to completely reset the environment:
+
+1. Stop and remove existing containers:
+   ```bash
+   docker ps -a | grep research-env | awk '{print $1}' | xargs -r docker stop
+   docker ps -a | grep research-env | awk '{print $1}' | xargs -r docker rm
+   ```
+
+2. Remove the image:
+   ```bash
+   docker image rm research-env
+   ```
+
+3. Backup and clear local conda files:
+   ```bash
+   mkdir -p ~/conda_backup
+   mv ~/.condarc ~/conda_backup/ 2>/dev/null || true
+   mv ~/.conda ~/conda_backup/ 2>/dev/null || true
+   ```
+
+4. Rebuild the environment:
+   ```bash
+   cd ~/vermeer/container_envs/base
+   docker build -t research-env .
+   ```
+
+5. Restart VSCode and reopen the Dev Container
