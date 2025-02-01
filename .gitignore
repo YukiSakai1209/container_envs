@@ -52,3 +52,4 @@ devcontainer_*.log
 
 # Private files
 Instruction.md
+docs/
