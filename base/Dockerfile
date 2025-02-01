@@ -18,20 +18,28 @@ RUN usermod -u 1001 vscode \
     && groupmod -g 1001 vscode \
     && chown -R vscode:vscode /home/vscode
 
+# Set environment variables
+ENV PATH=/opt/conda/bin:$PATH
+ENV CONDA_AUTO_ACTIVATE_BASE=false
+
 # Copy and setup Conda environment
 COPY environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml && \
     conda clean -afy
 
-# Set default shell to bash
-SHELL ["/bin/bash", "-c"]
-
-# Initialize conda for both root and vscode user
+# Initialize conda in bash for both root and vscode user
 RUN conda init bash && \
-    su vscode -c "conda init bash" && \
+    su vscode -c "/opt/conda/bin/conda init bash" && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> /root/.bashrc && \
     echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/vscode/.bashrc && \
     echo "conda activate research" >> /home/vscode/.bashrc
 
-# Set environment variables
-ENV PATH=/opt/conda/bin:$PATH
-ENV CONDA_AUTO_ACTIVATE_BASE=false
+# Create and set entrypoint script
+RUN echo '#!/bin/bash\n\
+source /opt/conda/etc/profile.d/conda.sh\n\
+conda activate research\n\
+exec "$@"' > /usr/local/bin/entrypoint.sh && \
+    chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["bash"]
