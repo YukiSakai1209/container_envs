@@ -26,6 +26,12 @@ RUN conda env create -f /tmp/environment.yml && \
 # Set default shell to bash
 SHELL ["/bin/bash", "-c"]
 
-# Initialize conda and activate environment in bash
+# Initialize conda for both root and vscode user
 RUN conda init bash && \
+    su vscode -c "conda init bash" && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/vscode/.bashrc && \
     echo "conda activate research" >> /home/vscode/.bashrc
+
+# Set environment variables
+ENV PATH /opt/conda/bin:$PATH
+ENV CONDA_AUTO_ACTIVATE_BASE false
