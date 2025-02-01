@@ -98,6 +98,88 @@ This repository contains a development environment configuration using Dev Conta
      RUN conda env update -n research -f /tmp/environment.yml
      ```
 
+## Sharing Dev Container Settings Across Projects
+
+### Quick Setup for Existing Projects
+
+1. **Copy Essential Files**
+   ```bash
+   # From container_envs repository
+   cp -r .devcontainer /path/to/your/project/
+   ```
+
+2. **Adjust Workspace Path**
+   - Edit `.devcontainer/devcontainer.json`:
+   ```jsonc
+   {
+     "workspaceFolder": "/home/vscode/your/project/path",
+     "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/your/project/path,type=bind"
+   }
+   ```
+
+3. **Mount Parent Directory**
+   - Edit `.devcontainer/docker-compose.yml`:
+   ```yaml
+   services:
+     workspace:
+       volumes:
+         - type: bind
+           source: /path/to/parent/dir
+           target: /home/vscode/parent/dir
+   ```
+
+### Best Practices for Sharing
+
+1. **Use Relative Paths When Possible**
+   - Use `${localWorkspaceFolder}` in `devcontainer.json`
+   - Reference paths relative to the workspace root
+
+2. **Share Common Settings**
+   - Keep shared settings in `container_envs`
+   - Only override project-specific settings in individual projects
+
+3. **Version Control**
+   - Track `.devcontainer/` in Git
+   - Use `.gitignore` for project-specific secrets
+
+4. **Environment Management**
+   - Base environment: Use the standard `research` conda env
+   - Project-specific: Add `base/environment.yml` for extra packages
+
+### Troubleshooting Common Issues
+
+1. **Permission Issues**
+   - Ensure correct UID/GID in `docker-compose.yml`:
+   ```yaml
+   args:
+     USER_UID: "1001"  # Match your host user ID
+     USER_GID: "1001"  # Match your host group ID
+   ```
+
+2. **Mount Problems**
+   - Check if source paths exist on host
+   - Verify target paths in container
+   - Ensure FUSE support is enabled
+
+3. **Environment Conflicts**
+   - Use conda environments to isolate dependencies
+   - Keep `base/environment.yml` up to date
+
+### Example: Multi-Project Setup
+
+```
+/home/user/
+└── vermeer/                 # Parent directory
+    ├── container_envs/      # Base configuration
+    │   └── .devcontainer/
+    └── project_a/          # Your project
+        ├── .devcontainer/  # Project-specific settings
+        │   ├── devcontainer.json
+        │   └── docker-compose.yml
+        └── base/
+            └── environment.yml
+```
+
 ## Prerequisites
 
 - Docker Desktop (for local development)
@@ -222,3 +304,135 @@ docker pull ghcr.io/yukisakai1209/research-env-base:v2025.02.01
 ## License
 
 MIT License - See LICENSE file for details
+
+### Critical Path Configuration
+
+> ⚠️ **Most Common Failure Point**: Path configuration mismatches between host and container
+
+To avoid path-related issues, follow these exact steps:
+
+1. **Identify Your Project Structure**
+   ```bash
+   # Example structure
+   /home/username/vermeer/              # Parent directory
+   ├── container_envs/                  # This repository
+   └── your_project/                    # Your project directory
+   ```
+
+2. **Configure Container Paths**
+   - In `.devcontainer/devcontainer.json`:
+   ```jsonc
+   {
+     "name": "Research Environment",
+     "dockerComposeFile": "docker-compose.yml",
+     "service": "workspace",
+     // IMPORTANT: This must match your project path inside the container
+     "workspaceFolder": "/home/vscode/vermeer/your_project",
+     // CRITICAL: This maps your local project to the container
+     "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/vermeer/your_project,type=bind",
+     // Other settings...
+   }
+   ```
+
+3. **Set Up Parent Directory Mount**
+   - In `.devcontainer/docker-compose.yml`:
+   ```yaml
+   services:
+     workspace:
+       # ... other settings ...
+       volumes:
+         - type: bind
+           source: ${HOME}/.ssh  # SSH keys
+           target: /home/vscode/.ssh
+         - type: bind
+           source: /home/username/vermeer  # CRITICAL: Parent directory
+           target: /home/vscode/vermeer    # Must match workspaceFolder path
+   ```
+
+### Validation Checklist
+
+Before starting the container, verify:
+
+1. **Path Consistency**
+   ```bash
+   # Check your actual paths
+   echo $HOME                    # Should match source paths
+   ls -la /home/username/vermeer # Verify parent directory exists
+   ```
+
+2. **Permission Setup**
+   ```bash
+   # Check your user ID and group ID
+   id -u  # Usually 1000 or 1001
+   id -g  # Usually 1000 or 1001
+   
+   # Update docker-compose.yml if needed
+   args:
+     USER_UID: "1001"  # Must match your id -u
+     USER_GID: "1001"  # Must match your id -g
+   ```
+
+3. **Mount Points**
+   ```bash
+   # Verify mount source directories exist
+   test -d ${HOME}/.ssh && echo "SSH directory exists" || echo "Missing SSH directory"
+   test -d /home/username/vermeer && echo "Parent directory exists" || echo "Missing parent directory"
+   ```
+
+### Troubleshooting Guide
+
+If you encounter issues:
+
+1. **Container Won't Start**
+   ```bash
+   # Check Docker logs
+   docker logs $(docker ps -qf "name=your_project")
+   
+   # Verify FUSE support
+   docker run --rm --privileged alpine ls /dev/fuse
+   ```
+
+2. **Path Resolution Problems**
+   ```bash
+   # Inside container
+   pwd                 # Should show /home/vscode/vermeer/your_project
+   ls -la /home/vscode # Check mount points
+   ```
+
+3. **Permission Denied**
+   ```bash
+   # Inside container
+   id                  # Verify UID/GID
+   ls -la /home/vscode # Check directory permissions
+   ```
+
+### Recovery Steps
+
+If you need to reset your setup:
+
+1. **Clean Up**
+   ```bash
+   # Remove existing container
+   docker-compose -f .devcontainer/docker-compose.yml down
+   
+   # Clean Docker cache
+   docker builder prune -f
+   ```
+
+2. **Reset Configuration**
+   ```bash
+   # Backup current config
+   cp -r .devcontainer .devcontainer.bak
+   
+   # Copy fresh config from container_envs
+   cp -r ../container_envs/.devcontainer .
+   ```
+
+3. **Verify and Restart**
+   ```bash
+   # Update paths
+   sed -i "s|/path/to/replace|$HOME/vermeer/your_project|g" .devcontainer/devcontainer.json
+   
+   # Restart VS Code
+   code .
+   ```
