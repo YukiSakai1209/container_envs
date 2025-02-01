@@ -28,6 +28,9 @@ RUN conda update -n base -c defaults conda && \
 RUN conda init bash && \
     echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' >> /etc/bash.bashrc && \
     echo '    . "/opt/conda/etc/profile.d/conda.sh"' >> /etc/bash.bashrc && \
+    echo '    if [[ -z "${CONDA_DEFAULT_ENV}" || "${CONDA_DEFAULT_ENV}" == "base" ]]; then' >> /etc/bash.bashrc && \
+    echo '        conda activate research' >> /etc/bash.bashrc && \
+    echo '    fi' >> /etc/bash.bashrc && \
     echo 'fi' >> /etc/bash.bashrc
 
 # Switch to vscode user and setup conda
@@ -55,9 +58,13 @@ RUN mkdir -p ~/.conda && \
     echo '# Ensure research environment is activated' >> ~/.bashrc && \
     echo 'if [[ -z "${CONDA_DEFAULT_ENV}" || "${CONDA_DEFAULT_ENV}" == "base" ]]; then' >> ~/.bashrc && \
     echo '    conda activate research' >> ~/.bashrc && \
-    echo 'fi'
+    echo 'fi' >> ~/.bashrc && \
+    echo '' >> ~/.bashrc && \
+    echo '# Disable auto-activation of base environment' >> ~/.bashrc && \
+    echo 'conda config --set auto_activate_base false' >> ~/.bashrc
 
 # Set environment variables
 ENV PATH=/opt/conda/bin:$PATH \
     CONDA_DIR=/opt/conda \
-    SHELL=/bin/bash
+    SHELL=/bin/bash \
+    CONDA_AUTO_ACTIVATE_BASE=false
