@@ -37,7 +37,7 @@ jobs:
           context: ./base
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/research-env-base:latest
-            ghcr.io/${{ github.repository_owner }}/research-env-base:${{ env.VERSION }}
+            ghcr.io/yukisakai1209/research-env-base:latest
+            ghcr.io/yukisakai1209/research-env-base:${{ env.VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
