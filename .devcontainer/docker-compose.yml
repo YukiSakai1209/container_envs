@@ -2,7 +2,7 @@ name: devcontainer
 
 services:
   workspace:
-    image: ghcr.io/yukisakai1209/research-env:latest
+    image: ghcr.io/yukisakai1209/research-env-base:latest
     build:
       context: .
       dockerfile: Dockerfile

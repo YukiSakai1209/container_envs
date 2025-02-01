@@ -27,4 +27,4 @@ RUN conda env create -f /tmp/environment.yml && \
 SHELL ["/bin/bash", "-c"]
 
 # Activate conda environment in bash
-RUN echo "conda activate y_241209" >> /home/vscode/.bashrc
+RUN echo "conda activate research" >> /home/vscode/.bashrc

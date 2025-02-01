@@ -49,3 +49,6 @@ ENV/
 ehthumbs.db
 Thumbs.db
 devcontainer_*.log
+
+# Private files
+Instruction.md

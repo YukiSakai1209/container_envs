@@ -1,4 +1,4 @@
-name: y_241209
+name: research
 channels:
   - conda-forge
   - defaults
