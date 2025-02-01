@@ -13,36 +13,36 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 # Setup FUSE configuration for SSHFS
 RUN echo "user_allow_other" >> /etc/fuse.conf
 
-# Setup user configuration
-RUN groupmod -g 1001 vscode || groupadd -g 1001 vscode && \
-    useradd -m -s /bin/bash -u 1001 vscode -g vscode || usermod -u 1001 -g vscode vscode && \
-    chown -R vscode:vscode /home/vscode
-
-# Ensure conda environment is properly set up
-ENV CONDA_DIR=/opt/conda
-ENV PATH=$CONDA_DIR/bin:$PATH
-ENV SHELL=/bin/bash
-
 # Copy and setup Conda environment
 COPY environment.yml /tmp/environment.yml
-RUN conda env create -f /tmp/environment.yml && \
+
+# Initialize conda for shell
+SHELL ["/bin/bash", "-c"]
+
+# Create conda environment and clean up
+RUN conda update -n base -c defaults conda && \
+    conda env create -f /tmp/environment.yml && \
     conda clean -afy
 
-# Initialize conda for both root and vscode user
+# Initialize conda in system-wide profile
 RUN conda init bash && \
-    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then . "/opt/conda/etc/profile.d/conda.sh"; fi' >> /etc/bash.bashrc && \
-    echo 'conda activate research' >> /etc/bash.bashrc
+    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' >> /etc/bash.bashrc && \
+    echo '    . "/opt/conda/etc/profile.d/conda.sh"' >> /etc/bash.bashrc && \
+    echo 'fi' >> /etc/bash.bashrc
 
+# Switch to vscode user and setup conda
 USER vscode
+WORKDIR /home/vscode
 
-# Initialize conda for vscode user
-RUN conda init bash && \
-    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then . "/opt/conda/etc/profile.d/conda.sh"; fi' >> ~/.bashrc && \
-    echo 'conda activate research' >> ~/.bashrc && \
-    mkdir -p ~/.conda
+# Setup conda for vscode user
+RUN mkdir -p ~/.conda && \
+    conda init bash && \
+    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then' >> ~/.bashrc && \
+    echo '    . "/opt/conda/etc/profile.d/conda.sh"' >> ~/.bashrc && \
+    echo '    conda activate research' >> ~/.bashrc && \
+    echo 'fi'  >> ~/.bashrc
 
-USER root
-
-# Set default shell to interactive bash
-SHELL ["/bin/bash", "--login", "-c"]
-CMD ["bash", "--login"]
+# Set environment variables
+ENV PATH=/opt/conda/bin:$PATH \
+    CONDA_DIR=/opt/conda \
+    SHELL=/bin/bash
