@@ -10,11 +10,82 @@ This repository contains a development environment configuration using Dev Conta
 - Remote development support with SSHFS integration
 - PBS job submission support for compute clusters
 
+## Using in a New Project
+
+1. Create a new repository from this template:
+   - Click "Use this template" on GitHub
+   - Or manually copy the following files to your new project:
+     ```
+     .devcontainer/
+     .gitignore
+     README.md
+     ```
+
+2. Set up the directory structure:
+   ```
+   your-project/
+   ├── README.md              # Project overview
+   ├── Instruction.md         # Private instructions (gitignored)
+   ├── DATA/                  # Experimental data (if needed)
+   ├── DEMO/                  # Demographic data (if needed)
+   ├── ref/                   # Reference materials (if needed)
+   ├── src/                   # Core components
+   │   ├── components/
+   │   ├── functions/
+   │   └── main.py
+   ├── analysis/             # Analysis scripts
+   │   ├── analysis_01_<CONTENTS>.py
+   │   └── analysis_02_<CONTENTS>.py
+   ├── docs/                 # Private documentation (gitignored)
+   ├── results/             # Analysis results
+   └── archives/           # Archived code
+   ```
+
+3. Configure the environment:
+   - Copy `.devcontainer/` to your project
+   - The container will automatically:
+     - Use the base image `ghcr.io/yukisakai1209/research-env-base`
+     - Create and activate the `research` conda environment
+     - Set up SSHFS mounts for remote access
+
+4. Start development:
+   ```bash
+   # Clone your new repository
+   git clone https://github.com/your-username/your-project.git
+   cd your-project
+
+   # Open in VS Code
+   code .
+   ```
+   - Click "Reopen in Container" when prompted
+   - The environment will be automatically set up
+
+5. Add project-specific dependencies:
+   - Create `base/environment.yml` for additional packages:
+     ```yaml
+     name: research
+     channels:
+       - conda-forge
+     dependencies:
+       # Add your project-specific packages here
+       - python=3.12
+       - numpy
+       - pandas
+     ```
+   - Update `.devcontainer/Dockerfile`:
+     ```dockerfile
+     ARG BASE_IMAGE=ghcr.io/yukisakai1209/research-env-base:latest
+     FROM ${BASE_IMAGE}
+
+     # Copy and update environment if needed
+     COPY base/environment.yml /tmp/
+     RUN conda env update -n research -f /tmp/environment.yml
+     ```
+
 ## Prerequisites
 
 - Docker Desktop (for local development)
-- VS Code
-- Dev Containers extension
+- VS Code with Dev Containers extension
 - SSH access to compute servers (for remote development)
 
 ## Quick Start
@@ -25,272 +96,112 @@ git clone https://github.com/YukiSakai1209/container_envs.git
 cd container_envs
 ```
 
-2. Configure workspace:
-- Open `.devcontainer/devcontainer.json`
-- Modify `workspaceFolder` to point to your project directory
-- Default: `/home/vscode/vermeer/container_envs`
-
-3. Open in VS Code:
-- Open the cloned directory
-- When prompted, click "Reopen in Container"
-- The container will be built automatically
+2. Open in VS Code and click "Reopen in Container" when prompted
+   - The container will be built automatically
+   - The `research` conda environment will be activated automatically
 
 ## Environment Details
 
-### Python Environment
+### Base Image
+- Uses `ghcr.io/yukisakai1209/research-env-base` as the base image
 - Python 3.12
-- Scientific computing packages (numpy, pandas, scipy)
-- Machine learning tools (scikit-learn, optuna)
-- Visualization libraries (matplotlib, seaborn)
-- Code quality tools (black, ruff)
-- Jupyter integration
+- Scientific computing packages:
+  - numpy, pandas, scipy
+  - scikit-learn, optuna
+  - matplotlib, seaborn
+- Development tools:
+  - black, ruff, pytest
+  - Jupyter integration
+- System tools:
+  - git, sshfs, openssh-client, fuse3
 
 ### Remote Server Integration
 - SSHFS mounts for seamless access to remote servers
-- Automatic mounting of:
-  - vermeer (ncd-node01g)
-  - magritte (ncd-node02g)
-  - chagall (ncd-node03g)
-  - picasso (ncd-node04g)
-  - ncd (ncd-node05g)
-  - xnef-data1 (ncd-node06g)
-  - xnef-data2 (ncd-node07g)
+- Automatic mounting of compute nodes
 
-## Usage Scenarios
+## Usage
 
 ### 1. Local Development
-- Use VS Code with the Dev Container for development and testing
-- All dependencies and tools are pre-configured
-- Direct access to remote servers via SSHFS
+```bash
+# Pull the latest base image
+docker pull ghcr.io/yukisakai1209/research-env-base:latest
+
+# Open in VS Code with Dev Containers
+code .
+```
 
 ### 2. Compute Server Usage
-#### Option 1: Direct Container Usage
 ```bash
 # On compute server
-docker pull ghcr.io/yukisakai1209/research-env:latest
-docker run -v /path/to/data:/data ghcr.io/yukisakai1209/research-env:latest /opt/conda/envs/y_241209/bin/python3 /data/your_script.py
-```
-
-#### Option 2: PBS Job Submission
-1. Create a PBS script:
-```bash
-#!/bin/bash
-#PBS -l nodes=1:ppn=4
-#PBS -l walltime=24:00:00
-#PBS -N your_job_name
-
-cd $PBS_O_WORKDIR
-docker run -v /path/to/data:/data ghcr.io/yukisakai1209/research-env:latest /opt/conda/envs/y_241209/bin/python3 /data/your_script.py
-```
-
-2. Submit the job:
-```bash
-qsub your_job_script.pbs
-```
-
-### 3. Container Registry (GHCR)
-
-We use GitHub Container Registry (GHCR) to distribute our development environment. This provides several benefits:
-
-- Seamless integration with GitHub Actions for automated builds
-- Built-in authentication using GitHub credentials
-- Reliable and fast distribution of container images
-- Version tracking with date-based tags
-
-### Using the Container Image
-
-1. Authentication Setup
-```bash
-# Login to GHCR (required once per machine)
-echo $GITHUB_PAT | docker login ghcr.io -u YukiSakai1209 --password-stdin
-```
-
-2. Pull the Latest Image
-```bash
-# Pull the latest version
-docker pull ghcr.io/yukisakai1209/research-env:latest
-
-# Or pull a specific date version
-docker pull ghcr.io/yukisakai1209/research-env:v2025.02.01
-```
-
-### Environment Updates
-
-The container image is automatically updated when changes are pushed to the main branch:
-
-1. Changes to `.devcontainer/**` trigger automatic builds
-2. New images are tagged with both `latest` and a date-based version (e.g., v2025.02.01)
-3. To update your environment:
-   - VS Code: Click "Rebuild Container"
-   - Manual: Pull the latest image as shown above
-
-### Usage on Compute Servers
-
-1. First-time Setup
-```bash
-# On each compute server
-echo $GITHUB_PAT | docker login ghcr.io -u YukiSakai1209 --password-stdin
-```
-
-2. Regular Usage
-```bash
-# Pull the latest image
-docker pull ghcr.io/yukisakai1209/research-env:latest
-
-# Run with PBS
-qsub your_job_script.pbs
-```
-
-Example PBS script:
-```bash
-#!/bin/bash
-#PBS -l nodes=1:ppn=4
-#PBS -l walltime=24:00:00
-#PBS -N your_job_name
-
-cd $PBS_O_WORKDIR
-docker run -v $(pwd):/workspace ghcr.io/yukisakai1209/research-env:latest /opt/conda/envs/y_241209/bin/python3 /workspace/your_script.py
-```
-
-### Version Management
-
-Container images are versioned using a date-based system for better clarity and tracking:
-
-- `latest` tag: Always points to the most recent stable version
-- Date-based tags (e.g., `v2025.02.01`): Provides a clear timeline of versions
-- Format: `vYYYY.MM.DD` where:
-  - `YYYY`: Four-digit year
-  - `MM`: Two-digit month
-  - `DD`: Two-digit day
-
-To use a specific version:
-```bash
-# Pull the latest version
-docker pull ghcr.io/yukisakai1209/research-env:latest
-
-# Pull a specific date version
-docker pull ghcr.io/yukisakai1209/research-env:v2025.02.01
-
-# In docker-compose.yml
-image: ghcr.io/yukisakai1209/research-env:v2025.02.01
-```
-
-This versioning system offers several benefits:
-- Human-readable version numbers
-- Clear chronological ordering
-- Easy identification of image age
-- Simple rollback to previous versions
-
-### Storage and Visibility
-
-#### Storage Limits and Billing
-- Public packages are free to use with no storage limits
-- Currently, container image storage and bandwidth are in an extended free period
-- When billing starts (with 1-month advance notice):
-  - Free storage varies by account plan (e.g., 2GB for GitHub Team)
-  - Overage charges:
-    - Storage: $0.008 USD per GB per day
-    - Data transfer: $0.50 USD per GB
-  - Data transfer resets monthly, storage usage does not
-
-#### Package Visibility
-- Container images can be public even if your repositories are private
-- Public packages in Container Registry:
-  - Allow anonymous access
-  - Can be pulled without authentication
-  - Support direct CLI access
-- Visibility can be managed independently of repository settings
-- Perfect for sharing development environments while keeping code private
-
-### Authentication
-
-For private packages or publishing:
-```bash
-# Login to GHCR (required once per machine)
-echo $GITHUB_PAT | docker login ghcr.io -u YukiSakai1209 --password-stdin
-```
-
-### Troubleshooting
-
-1. Authentication Issues
-   - Ensure you're logged in to GHCR
-   - Check if your GitHub PAT has required permissions
-   - Try re-authenticating: `docker login ghcr.io`
-
-2. Pull Failures
-   - Check network connectivity
-   - Verify image name and tag
-   - Ensure you have sufficient disk space
-
-3. Container Startup Issues
-   - Check if all required mounts are accessible
-   - Verify SSH keys are properly set up for SSHFS
-   - Review container logs: `docker logs <container-id>`
-
-For additional help or to report issues, please use the GitHub Issues section of this repository.
-
-## 環境管理
-
-このプロジェクトは共通の基本イメージ `ghcr.io/yukisakai1209/research-env-base` を使用しています。これにより、プロジェクト間での環境の一貫性と再利用性を確保しています。
-
-### 基本イメージの構成
-
-基本イメージには以下が含まれています：
-- Python 3.12
-- 科学計算ライブラリ（numpy, pandas, scipy, etc.）
-- 開発ツール（black, ruff, pytest）
-- システム依存関係（SSHFS, FUSE）
-
-### 新しいプロジェクトでの利用方法
-
-1. 基本イメージの取得：
-```bash
 docker pull ghcr.io/yukisakai1209/research-env-base:latest
+docker run -v $(pwd):/workspace ghcr.io/yukisakai1209/research-env-base:latest /opt/conda/envs/research/bin/python3 /workspace/your_script.py
 ```
 
-2. プロジェクトの`.devcontainer/Dockerfile`で基本イメージを指定：
-```dockerfile
-ARG BASE_IMAGE=ghcr.io/yukisakai1209/research-env-base:latest
-FROM ${BASE_IMAGE}
+### PBS Job Example
+```bash
+#!/bin/bash
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=24:00:00
+#PBS -N your_job_name
 
-# プロジェクト固有の依存関係がある場合のみ追加
+cd $PBS_O_WORKDIR
+docker run -v $(pwd):/workspace ghcr.io/yukisakai1209/research-env-base:latest /opt/conda/envs/research/bin/python3 /workspace/your_script.py
 ```
 
-3. プロジェクト固有の依存関係がある場合は、`environment.yml`を作成して追加のパッケージを指定
-
-### バージョン管理
-
-- 基本イメージは日付ベースのバージョニング（vYYYY.MM.DD）を使用
-- 特定のバージョンを使用する場合は、`BASE_IMAGE`で指定：
-```dockerfile
-ARG BASE_IMAGE=ghcr.io/yukisakai1209/research-env-base:v2025.02.01
-```
-
-## Directory Structure
+## Project Structure
 
 ```
 .
-├── .devcontainer/          # Dev Container configuration
-├── DATA/                   # Data directory (if exists)
-├── DEMO/                   # Demographic data (if exists)
-├── ref/                    # Reference materials
-├── analysis/              # Analysis scripts
-│   ├── analysis_01_*.py
-│   └── analysis_02_*.py
-├── docs/                  # Documentation
-│   ├── analysis_*.md
+├── README.md              # Project overview and setup instructions
+├── Instruction.md         # Private instructions and project goals
+├── DATA/                  # Experimental data (if exists)
+├── DEMO/                  # Demographic data (if exists)
+├── ref/                   # Reference materials (if exists)
+├── src/                   # Core components and functions
+│   ├── components/
+│   ├── functions/
+│   └── main.py
+├── analysis/             # Analysis scripts
+│   ├── analysis_01_<CONTENTS>.py
+│   └── analysis_02_<CONTENTS>.py
+├── docs/                 # Private documentation (not tracked in Git)
+│   ├── analysis_01_<CONTENTS>.md
+│   ├── analysis_02_<CONTENTS>.md
 │   └── results_*.md
-├── results/               # Results output
-└── archives/             # Archived code
+├── results/             # Analysis results
+│   └── results_01_<CONTENTS>/
+│   └── results_02_<CONTENTS>/
+└── archives/           # Archived code
 ```
 
-## Contributing
+### Directory Naming Convention
+- Use format: `<NUM>_<CONTENTS>`
+- `<NUM>`: Experiment/result number
+- `<CONTENTS>`: Brief description of analysis/experiment content
+- Example: `analysis_01_preprocessing.py`
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -m 'Add some feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Open a Pull Request
+## Version Management
+
+Container images use a date-based versioning system:
+- `latest`: Most recent stable version
+- Date-based tags: `vYYYY.MM.DD` (e.g., `v2025.02.01`)
+
+To use a specific version:
+```bash
+docker pull ghcr.io/yukisakai1209/research-env-base:v2025.02.01
+```
+
+## Troubleshooting
+
+1. Environment Issues
+   - Ensure you're in the `research` conda environment
+   - Check if all required packages are installed
+   - Try rebuilding the container: "Dev Containers: Rebuild Container"
+
+2. Remote Access Issues
+   - Verify SSH keys are properly set up
+   - Check SSHFS mounts: `mount | grep fuse`
+   - Ensure required ports are accessible
 
 ## License
 
