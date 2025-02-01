@@ -101,6 +101,68 @@ Note: Always commit your preferred environment configuration to ensure consisten
    - Select "Dev Containers: Open Folder in Container"
    - Choose your project directory
 
+### Conda Environment Configuration
+
+The container uses a robust conda initialization system that ensures the research environment is properly activated in all scenarios:
+
+- **Automatic Initialization**: The container automatically initializes conda and activates the `research` environment through:
+  - System-wide initialization in `/etc/bash.bashrc`
+  - User-specific initialization in `~/.bashrc`
+  - Login shell configuration
+  - Custom entrypoint script
+
+- **Environment Variables**:
+  ```bash
+  CONDA_DIR=/opt/conda
+  PATH=$CONDA_DIR/bin:$PATH
+  CONDA_AUTO_ACTIVATE_BASE=false
+  ```
+
+### Troubleshooting Conda Issues
+
+If you encounter any conda-related issues:
+
+1. **Verify Shell Type**
+   ```bash
+   # Should show '-bash' for login shell
+   echo $0
+   
+   # If not in login shell, start one
+   exec bash -l
+   ```
+
+2. **Check Conda Initialization**
+   ```bash
+   # Verify conda is properly sourced
+   which conda
+   
+   # Should show /opt/conda/bin/conda
+   echo $CONDA_DIR
+   
+   # Check if conda.sh exists
+   ls -l /opt/conda/etc/profile.d/conda.sh
+   ```
+
+3. **Manual Environment Activation**
+   ```bash
+   # Source conda initialization
+   . /opt/conda/etc/profile.d/conda.sh
+   
+   # Activate research environment
+   conda activate research
+   ```
+
+4. **Reset Shell Environment**
+   ```bash
+   # Start a new login shell
+   exec bash -l
+   ```
+
+If issues persist after trying these steps, you can:
+1. Rebuild the container: `docker build -t research-env .`
+2. Remove the container and recreate it in VS Code
+3. Check the container logs for initialization errors
+
 ### Important Notes on Conda Environment
 
 The container is configured to automatically initialize and activate the conda environment. The setup includes:
