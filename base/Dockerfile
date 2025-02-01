@@ -28,18 +28,15 @@ RUN conda env create -f /tmp/environment.yml && \
     conda clean -afy
 
 # Initialize conda in bash for both root and vscode user
-RUN conda init bash && \
-    su vscode -c "/opt/conda/bin/conda init bash" && \
-    echo ". /opt/conda/etc/profile.d/conda.sh" >> /root/.bashrc && \
-    echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/vscode/.bashrc && \
-    echo "conda activate research" >> /home/vscode/.bashrc
+RUN echo '. /opt/conda/etc/profile.d/conda.sh' >> /etc/bash.bashrc && \
+    echo 'conda activate research' >> /etc/bash.bashrc && \
+    mkdir -p /etc/profile.d && \
+    echo '. /opt/conda/etc/profile.d/conda.sh' >> /etc/profile.d/conda.sh && \
+    echo 'conda activate research' >> /etc/profile.d/conda.sh && \
+    chmod +x /etc/profile.d/conda.sh
 
-# Create and set entrypoint script
-RUN echo '#!/bin/bash\n\
-source /opt/conda/etc/profile.d/conda.sh\n\
-conda activate research\n\
-exec "$@"' > /usr/local/bin/entrypoint.sh && \
-    chmod +x /usr/local/bin/entrypoint.sh
+USER vscode
+RUN echo '. /opt/conda/etc/profile.d/conda.sh' >> ~/.bashrc && \
+    echo 'conda activate research' >> ~/.bashrc
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["bash"]
+USER root
