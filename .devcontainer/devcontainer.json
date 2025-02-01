@@ -33,7 +33,7 @@
         }
     },
     "remoteUser": "vscode",
-    "postCreateCommand": "conda activate research",
+    "postCreateCommand": "echo 'conda activate research' >> ~/.bashrc",
     "mounts": [
         "source=${localEnv:HOME}/.windsurf,target=/home/vscode/.windsurf,type=bind,consistency=cached"
     ]
