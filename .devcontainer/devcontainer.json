@@ -20,10 +20,14 @@
                         "path": "/bin/bash",
                         "args": ["--login"]
                     }
+                },
+                "terminal.integrated.env.linux": {
+                    "CONDA_DIR": "/opt/conda"
                 }
             }
         }
     },
     "remoteUser": "vscode",
-    "updateRemoteUserUID": true
+    "updateRemoteUserUID": true,
+    "postCreateCommand": "echo '. \"${CONDA_DIR}/etc/profile.d/conda.sh\" && conda activate research' >> ~/.bashrc"
 }
