@@ -14,9 +14,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 RUN echo "user_allow_other" >> /etc/fuse.conf
 
 # Setup user configuration
-RUN useradd -m -s /bin/bash -u 1001 vscode && \
-    groupadd -g 1001 vscode && \
-    usermod -g vscode vscode && \
+RUN groupmod -g 1001 vscode || groupadd -g 1001 vscode && \
+    useradd -m -s /bin/bash -u 1001 vscode -g vscode || usermod -u 1001 -g vscode vscode && \
     chown -R vscode:vscode /home/vscode
 
 # Ensure conda environment is properly set up
