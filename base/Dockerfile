@@ -33,5 +33,5 @@ RUN conda init bash && \
     echo "conda activate research" >> /home/vscode/.bashrc
 
 # Set environment variables
-ENV PATH /opt/conda/bin:$PATH
-ENV CONDA_AUTO_ACTIVATE_BASE false
+ENV PATH=/opt/conda/bin:$PATH
+ENV CONDA_AUTO_ACTIVATE_BASE=false
