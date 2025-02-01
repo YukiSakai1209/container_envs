@@ -95,14 +95,14 @@ We use GitHub Container Registry (GHCR) to distribute our development environmen
 - Seamless integration with GitHub Actions for automated builds
 - Built-in authentication using GitHub credentials
 - Reliable and fast distribution of container images
-- Version tracking with git commit hashes
+- Version tracking with date-based tags
 
 ### Using the Container Image
 
 1. Authentication Setup
 ```bash
 # Login to GHCR (required once per machine)
-echo $GITHUB_PAT | docker login ghcr.io -u USERNAME --password-stdin
+echo $GITHUB_PAT | docker login ghcr.io -u YukiSakai1209 --password-stdin
 ```
 
 2. Pull the Latest Image
@@ -110,8 +110,8 @@ echo $GITHUB_PAT | docker login ghcr.io -u USERNAME --password-stdin
 # Pull the latest version
 docker pull ghcr.io/yukisakai1209/research-env:latest
 
-# Or pull a specific version using git commit hash
-docker pull ghcr.io/yukisakai1209/research-env:<commit-hash>
+# Or pull a specific date version
+docker pull ghcr.io/yukisakai1209/research-env:v2025.02.01
 ```
 
 ### Environment Updates
@@ -119,7 +119,7 @@ docker pull ghcr.io/yukisakai1209/research-env:<commit-hash>
 The container image is automatically updated when changes are pushed to the main branch:
 
 1. Changes to `.devcontainer/**` trigger automatic builds
-2. New images are tagged with both `latest` and the git commit hash
+2. New images are tagged with both `latest` and a date-based version (e.g., v2025.02.01)
 3. To update your environment:
    - VS Code: Click "Rebuild Container"
    - Manual: Pull the latest image as shown above
@@ -129,7 +129,7 @@ The container image is automatically updated when changes are pushed to the main
 1. First-time Setup
 ```bash
 # On each compute server
-echo $GITHUB_PAT | docker login ghcr.io -u USERNAME --password-stdin
+echo $GITHUB_PAT | docker login ghcr.io -u YukiSakai1209 --password-stdin
 ```
 
 2. Regular Usage
@@ -138,7 +138,7 @@ echo $GITHUB_PAT | docker login ghcr.io -u USERNAME --password-stdin
 docker pull ghcr.io/yukisakai1209/research-env:latest
 
 # Run with PBS
-qsub -v IMAGE=ghcr.io/yukisakai1209/research-env:latest your_job_script.pbs
+qsub your_job_script.pbs
 ```
 
 Example PBS script:
@@ -149,7 +149,7 @@ Example PBS script:
 #PBS -N your_job_name
 
 cd $PBS_O_WORKDIR
-docker run -v $(pwd):/workspace $IMAGE /opt/conda/envs/y_241209/bin/python3 /workspace/your_script.py
+docker run -v $(pwd):/workspace ghcr.io/yukisakai1209/research-env:latest /opt/conda/envs/y_241209/bin/python3 /workspace/your_script.py
 ```
 
 ### Version Management
@@ -207,7 +207,7 @@ This versioning system offers several benefits:
 For private packages or publishing:
 ```bash
 # Login to GHCR (required once per machine)
-echo $GITHUB_PAT | docker login ghcr.io -u USERNAME --password-stdin
+echo $GITHUB_PAT | docker login ghcr.io -u YukiSakai1209 --password-stdin
 ```
 
 ### Troubleshooting
