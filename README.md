@@ -154,13 +154,32 @@ docker run -v $(pwd):/workspace $IMAGE /opt/conda/envs/y_241209/bin/python3 /wor
 
 ### Version Management
 
+Container images are versioned using a date-based system for better clarity and tracking:
+
 - `latest` tag: Always points to the most recent stable version
-- Commit hash tags: Allows running specific versions for reproducibility
-- To use a specific version:
-  ```bash
-  # In docker-compose.yml
-  image: ghcr.io/yukisakai1209/research-env@sha256:<digest>
-  ```
+- Date-based tags (e.g., `v2025.02.01`): Provides a clear timeline of versions
+- Format: `vYYYY.MM.DD` where:
+  - `YYYY`: Four-digit year
+  - `MM`: Two-digit month
+  - `DD`: Two-digit day
+
+To use a specific version:
+```bash
+# Pull the latest version
+docker pull ghcr.io/yukisakai1209/research-env:latest
+
+# Pull a specific date version
+docker pull ghcr.io/yukisakai1209/research-env:v2025.02.01
+
+# In docker-compose.yml
+image: ghcr.io/yukisakai1209/research-env:v2025.02.01
+```
+
+This versioning system offers several benefits:
+- Human-readable version numbers
+- Clear chronological ordering
+- Easy identification of image age
+- Simple rollback to previous versions
 
 ### Storage and Visibility
 
