@@ -1,6 +1,7 @@
 name: y_241209
 channels:
   - defaults
+  - conda-forge
 dependencies:
   - python=3.12.2
   - pip
@@ -28,6 +29,11 @@ dependencies:
     # 統計解析
     - statannotations==0.7.1
     - pingouin==0.5.5
+    # 高速化・最適化
+    - cython==3.0.8
+    - numba==0.59.0
+    # 強化学習
+    - gymnasium==0.29.1
     # ユーティリティ
     - tqdm==4.67.1
     - jupyter==1.0.0
