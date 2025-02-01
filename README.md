@@ -68,7 +68,7 @@ cd container_envs
 ```bash
 # On compute server
 docker pull ghcr.io/yukisakai1209/research-env:latest
-docker run -v /path/to/data:/data ghcr.io/yukisakai1209/research-env:latest python /data/your_script.py
+docker run -v /path/to/data:/data ghcr.io/yukisakai1209/research-env:latest /opt/conda/envs/y_241209/bin/python /data/your_script.py
 ```
 
 #### Option 2: PBS Job Submission
@@ -80,7 +80,7 @@ docker run -v /path/to/data:/data ghcr.io/yukisakai1209/research-env:latest pyth
 #PBS -N your_job_name
 
 cd $PBS_O_WORKDIR
-docker run -v /path/to/data:/data ghcr.io/yukisakai1209/research-env:latest python /data/your_script.py
+docker run -v /path/to/data:/data ghcr.io/yukisakai1209/research-env:latest /opt/conda/envs/y_241209/bin/python /data/your_script.py
 ```
 
 2. Submit the job:
@@ -149,7 +149,7 @@ Example PBS script:
 #PBS -N your_job_name
 
 cd $PBS_O_WORKDIR
-docker run -v $(pwd):/workspace $IMAGE python /workspace/your_script.py
+docker run -v $(pwd):/workspace $IMAGE /opt/conda/envs/y_241209/bin/python /workspace/your_script.py
 ```
 
 ### Version Management
