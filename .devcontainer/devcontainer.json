@@ -2,6 +2,8 @@
     "name": "Research Environment",
     "dockerComposeFile": "docker-compose.yml",
     "build": {
+        "context": "..",
+        "dockerfile": "base/Dockerfile",
         "args": {
             "ENVIRONMENT_YML": ".devcontainer/environment.yml"
         }
@@ -26,6 +28,7 @@
             ],
             "settings": {
                 "python.defaultInterpreterPath": "/opt/conda/envs/research/bin/python",
+                "python.terminal.activateEnvironment": true,
                 "python.linting.enabled": true,
                 "python.formatting.provider": "black",
                 "editor.formatOnSave": true,
@@ -38,6 +41,8 @@
         }
     },
     "remoteUser": "vscode",
+    "updateRemoteUserUID": true,
+    "overrideCommand": false,
     "postCreateCommand": "echo 'conda activate research' >> ~/.bashrc",
     "mounts": [
         "source=${localEnv:HOME}/.windsurf,target=/home/vscode/.windsurf,type=bind,consistency=cached"
