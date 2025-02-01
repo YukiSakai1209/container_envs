@@ -26,5 +26,6 @@ RUN conda env create -f /tmp/environment.yml && \
 # Set default shell to bash
 SHELL ["/bin/bash", "-c"]
 
-# Activate conda environment in bash
-RUN echo "conda activate research" >> /home/vscode/.bashrc
+# Initialize conda and activate environment in bash
+RUN conda init bash && \
+    echo "conda activate research" >> /home/vscode/.bashrc
