@@ -229,6 +229,43 @@ echo $GITHUB_PAT | docker login ghcr.io -u YukiSakai1209 --password-stdin
 
 For additional help or to report issues, please use the GitHub Issues section of this repository.
 
+## 環境管理
+
+このプロジェクトは共通の基本イメージ `ghcr.io/yukisakai1209/research-env-base` を使用しています。これにより、プロジェクト間での環境の一貫性と再利用性を確保しています。
+
+### 基本イメージの構成
+
+基本イメージには以下が含まれています：
+- Python 3.12
+- 科学計算ライブラリ（numpy, pandas, scipy, etc.）
+- 開発ツール（black, ruff, pytest）
+- システム依存関係（SSHFS, FUSE）
+
+### 新しいプロジェクトでの利用方法
+
+1. 基本イメージの取得：
+```bash
+docker pull ghcr.io/yukisakai1209/research-env-base:latest
+```
+
+2. プロジェクトの`.devcontainer/Dockerfile`で基本イメージを指定：
+```dockerfile
+ARG BASE_IMAGE=ghcr.io/yukisakai1209/research-env-base:latest
+FROM ${BASE_IMAGE}
+
+# プロジェクト固有の依存関係がある場合のみ追加
+```
+
+3. プロジェクト固有の依存関係がある場合は、`environment.yml`を作成して追加のパッケージを指定
+
+### バージョン管理
+
+- 基本イメージは日付ベースのバージョニング（vYYYY.MM.DD）を使用
+- 特定のバージョンを使用する場合は、`BASE_IMAGE`で指定：
+```dockerfile
+ARG BASE_IMAGE=ghcr.io/yukisakai1209/research-env-base:v2025.02.01
+```
+
 ## Directory Structure
 
 ```

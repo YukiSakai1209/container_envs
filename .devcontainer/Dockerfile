@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/devcontainers/miniconda:3
+ARG BASE_IMAGE=ghcr.io/yukisakai1209/research-env-base:latest
+FROM ${BASE_IMAGE}
 
 ARG USERNAME=vscode
 ARG USER_UID=1001
