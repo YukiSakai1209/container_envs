@@ -1,5 +1,5 @@
 # Base image for research environment
-FROM continuumio/miniconda3:latest
+FROM mcr.microsoft.com/devcontainers/miniconda:0-3
 
 # Install basic system dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -28,23 +28,17 @@ COPY environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml && \
     conda clean -afy
 
-# Initialize conda in system-wide profile
+# Initialize conda for both root and vscode user
 RUN conda init bash && \
-    echo '. "$CONDA_DIR/etc/profile.d/conda.sh"' >> /etc/bash.bashrc && \
-    echo 'if [ -z "${CONDA_DEFAULT_ENV}" ]; then' >> /etc/bash.bashrc && \
-    echo '    conda activate research' >> /etc/bash.bashrc && \
-    echo 'fi'
+    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then . "/opt/conda/etc/profile.d/conda.sh"; fi' >> /etc/bash.bashrc && \
+    echo 'conda activate research' >> /etc/bash.bashrc
 
-# Setup for vscode user
 USER vscode
-WORKDIR /home/vscode
 
 # Initialize conda for vscode user
 RUN conda init bash && \
-    echo '. "$CONDA_DIR/etc/profile.d/conda.sh"' >> ~/.bashrc && \
-    echo 'if [ -z "${CONDA_DEFAULT_ENV}" ]; then' >> ~/.bashrc && \
-    echo '    conda activate research' >> ~/.bashrc && \
-    echo 'fi' && \
+    echo 'if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then . "/opt/conda/etc/profile.d/conda.sh"; fi' >> ~/.bashrc && \
+    echo 'conda activate research' >> ~/.bashrc && \
     mkdir -p ~/.conda
 
 USER root
