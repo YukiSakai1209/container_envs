@@ -4,6 +4,8 @@
         "context": "..",
         "dockerfile": "base/Dockerfile"
     },
+    "workspaceFolder": "/home/vscode/vermeer/container_envs",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/vermeer/container_envs,type=bind,consistency=cached",
     "customizations": {
         "vscode": {
             "extensions": [
