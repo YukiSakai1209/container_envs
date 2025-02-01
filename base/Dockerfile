@@ -34,7 +34,7 @@ RUN conda init bash && \
 USER vscode
 WORKDIR /home/vscode
 
-# Setup conda for vscode user
+# Setup conda for vscode user with research environment activation
 RUN mkdir -p ~/.conda && \
     conda init bash && \
     echo '# >>> conda initialize >>>' > ~/.bashrc && \
@@ -52,8 +52,10 @@ RUN mkdir -p ~/.conda && \
     echo 'unset __conda_setup' >> ~/.bashrc && \
     echo '# <<< conda initialize <<<' >> ~/.bashrc && \
     echo '' >> ~/.bashrc && \
-    echo '# Activate research environment' >> ~/.bashrc && \
-    echo 'conda activate research' >> ~/.bashrc
+    echo '# Ensure research environment is activated' >> ~/.bashrc && \
+    echo 'if [[ -z "${CONDA_DEFAULT_ENV}" || "${CONDA_DEFAULT_ENV}" == "base" ]]; then' >> ~/.bashrc && \
+    echo '    conda activate research' >> ~/.bashrc && \
+    echo 'fi'
 
 # Set environment variables
 ENV PATH=/opt/conda/bin:$PATH \
