@@ -1,29 +1,45 @@
 {
     "name": "Research Environment",
-    "build": {
-        "context": "../base",
-        "dockerfile": "Dockerfile"
-    },
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/vermeer/container_envs,type=bind,consistency=cached",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "workspace",
     "workspaceFolder": "/home/vscode/vermeer/container_envs",
     "customizations": {
         "vscode": {
-            "settings": {
-                "python.defaultInterpreterPath": "/opt/conda/envs/research/bin/python",
-                "python.terminal.activateEnvironment": true
-            },
             "extensions": [
                 "ms-python.python",
-                "ms-python.vscode-pylance"
-            ]
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter",
+                "ms-toolsai.jupyter-renderers",
+                "charliermarsh.ruff",
+                "njpwerner.autodocstring",
+                "eamodio.gitlens",
+                "github.vscode-github-actions",
+                "github.copilot",
+                "github.copilot-chat",
+                "MS-CEINTL.vscode-language-pack-ja"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/opt/conda/envs/research/bin/python",
+                "python.formatting.provider": "none",
+                "python.languageServer": "Pylance",
+                "python.analysis.typeCheckingMode": "basic",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true
+            }
         }
     },
-    "features": {
-        "ghcr.io/devcontainers/features/python:1": "none"
-    },
     "remoteUser": "vscode",
+    "containerUser": "vscode",
     "updateRemoteUserUID": true,
-    "postCreateCommand": "source /etc/profile.d/conda.sh && conda activate research",
-    "postStartCommand": "source /etc/profile.d/conda.sh && conda activate research",
-    "postAttachCommand": "source /etc/profile.d/conda.sh && conda activate research"
+    "postCreateCommand": "mkdir -p /home/vscode/vermeer/container_envs && chown -R vscode:vscode /home/vscode/vermeer && mkdir -p /home/vscode/.windsurf/logs && chown -R vscode:vscode /home/vscode/.windsurf && chmod -R 755 /home/vscode/.windsurf && conda activate research",
+    "mounts": [
+        "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.windsurf,target=/home/vscode/.windsurf,type=bind,consistency=cached"
+    ],
+    "runArgs": [
+        "--init",
+        "--security-opt",
+        "seccomp=unconfined"
+    ]
 }
