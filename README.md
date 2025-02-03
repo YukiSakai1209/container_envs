@@ -229,6 +229,162 @@ strict = true
    mypy src tests
    ```
 
+## Remote Job Execution with PBS
+
+### Setup Docker Image on Remote Server
+
+1. Login to GitHub Container Registry:
+   ```bash
+   echo $GITHUB_TOKEN | docker login ghcr.io -u YukiSakai1209 --password-stdin
+   ```
+
+2. Pull the research environment image:
+   ```bash
+   docker pull ghcr.io/yukisakai1209/research-env:latest
+   # Or specify version
+   docker pull ghcr.io/yukisakai1209/research-env:v2025.02.03
+   ```
+
+3. Test the environment:
+   ```bash
+   docker run ghcr.io/yukisakai1209/research-env:latest \
+     /opt/conda/envs/research/bin/python -c "import numpy; print('NumPy version:', numpy.__version__)"
+   ```
+
+### PBS Job Submission
+
+1. Example PBS script for Docker container (`job_docker.sh`):
+   ```bash
+   #!/bin/bash
+   #PBS -N docker_job
+   #PBS -l select=1:ncpus=4:mem=8gb
+   #PBS -l walltime=1:00:00
+   #PBS -j oe
+   
+   cd $PBS_O_WORKDIR
+   
+   # Run script in Docker container
+   docker run --rm \
+     -v $PWD:/workspace \
+     ghcr.io/yukisakai1209/research-env:latest \
+     /opt/conda/envs/research/bin/python /workspace/your_script.py
+   ```
+
+2. Submit the job:
+   ```bash
+   qsub job_docker.sh
+   ```
+
+3. For job arrays with different parameters:
+   ```bash
+   #!/bin/bash
+   #PBS -N array_job
+   #PBS -l select=1:ncpus=4:mem=8gb
+   #PBS -l walltime=1:00:00
+   #PBS -j oe
+   #PBS -J 1-10
+   
+   cd $PBS_O_WORKDIR
+   
+   # Run with job array index
+   docker run --rm \
+     -v $PWD:/workspace \
+     ghcr.io/yukisakai1209/research-env:latest \
+     /opt/conda/envs/research/bin/python /workspace/your_script.py --job-id $PBS_ARRAY_INDEX
+   ```
+
+### Data Management
+
+When mounting data directories, use absolute paths:
+```bash
+docker run --rm \
+  -v /absolute/path/to/data:/workspace/data \
+  -v /absolute/path/to/results:/workspace/results \
+  ghcr.io/yukisakai1209/research-env:latest \
+  /opt/conda/envs/research/bin/python /workspace/your_script.py
+```
+
+### Common Commands
+
+1. Check job status:
+   ```bash
+   qstat          # All jobs
+   qstat -u $USER # Your jobs only
+   ```
+
+2. Delete a job:
+   ```bash
+   qdel job_id
+   ```
+
+3. Check job output:
+   ```bash
+   cat docker_job.o[job_id]  # Standard output
+   cat docker_job.e[job_id]  # Standard error (if not merged)
+   ```
+
+## SSH Configuration
+
+1. Configure SSH for remote access:
+   ```bash
+   # In your .ssh/config
+   Host remote-server
+       HostName your.remote.server
+       User your-username
+       IdentityFile ~/.ssh/your_key
+   ```
+
+2. Test SSH connection:
+   ```bash
+   ssh remote-server
+   ```
+
+### PBS Job Submission
+
+1. Basic job submission:
+   ```bash
+   qsub job_script.sh
+   ```
+
+2. Example PBS script (`job_script.sh`):
+   ```bash
+   #!/bin/bash
+   #PBS -N job_name
+   #PBS -l select=1:ncpus=4:mem=8gb
+   #PBS -l walltime=1:00:00
+   #PBS -j oe
+   
+   cd $PBS_O_WORKDIR
+   source /path/to/your/conda/etc/profile.d/conda.sh
+   conda activate research
+   
+   python your_script.py
+   ```
+
+3. Common PBS commands:
+   ```bash
+   qstat          # Check job status
+   qstat -u $USER # Check your jobs
+   qdel job_id    # Delete a job
+   ```
+
+4. Job array submission:
+   ```bash
+   # Submit job array (jobs 1-10)
+   qsub -J 1-10 array_job.sh
+   ```
+
+### Data Transfer
+
+Use `scp` or `rsync` for data transfer:
+```bash
+# Copy to remote
+scp local_file.txt remote-server:path/to/destination/
+
+# Sync directories
+rsync -avz --progress local_dir/ remote-server:remote_dir/
+```
+
 ## Best Practices
 
 1. **Code Organization**
